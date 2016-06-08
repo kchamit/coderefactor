@@ -36,6 +36,10 @@ public class RSAProjectHelper {
 			"RsaRentalContract", "RsaRouteDelivery", "RsaSite", "RSAStopValueService", "RsaTransferRevenueLineItem",
 			"RsaUc4Service"
 	};
+	
+	private static final String[] CURRENT_RUN = new String[] {
+		"RsaCustomer", "RsaRentalContract"
+	};
 
 	private static final String[] RSA_WAVE1_PROJECTS = new String[] {
 			"RsaCustomer", "RsaRentalContract"
@@ -64,6 +68,10 @@ public class RSAProjectHelper {
 
 	public static Collection<String> getCommonProjects() {
 		return Arrays.asList(RSA_COMMON_PROJECTS);
+	}
+	
+	public static Collection<String> getCurrentRun() {
+		return Arrays.asList(CURRENT_RUN);
 	}
 
 	public static Collection<String> getAllButBillingProjects() {

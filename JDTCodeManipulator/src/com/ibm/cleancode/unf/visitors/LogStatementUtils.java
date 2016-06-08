@@ -9,6 +9,7 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
@@ -122,6 +123,21 @@ public class LogStatementUtils {
 		} else {
 			return LogType.UNKNOWN;
 		}
+	}
+	
+	public static boolean isMethodLogEligible(MethodDeclaration method){
+		boolean eligible = false;			
+		if(method.isConstructor()){
+			return false;
+		}
+		String methodName = method.getName().getIdentifier();	
+		if(methodName.matches("(get.*|set.*|equals|hashCode|toString)")){
+			return false;
+		}
+		if (method.getBody() != null && method.getBody().statements().size() > 2) {
+			eligible = true;
+		}				
+		return eligible;
 	}
 
 }
