@@ -175,11 +175,11 @@ public class ReturnExitLogCorrectionVisitor extends RewriteVisitor {
 			if(ex instanceof MethodInvocation){
 				isMethodInvocation = true;
 			}else{
-				LOGGER.info("Not a logger !!!");
+				LOGGER.info("Not a logger, may need to put logger manually");
 				return true;
 			}
 		}else{
-			LOGGER.info("Not a logger !!!");
+			LOGGER.info("Not a logger, may need to put logger manually");
 			return true;
 		}
 		

@@ -15,12 +15,12 @@ public class ReturnExitLogCorrectionInspector {
 
 	public static void main(String[] args) throws Exception {
 		boolean runSample = true;
-		for (String project : RSAProjectHelper.getCurrentRun()) {
+		for (String project : RSAProjectHelper.getAllProjects()) {
 			LOGGER.info("Processing : " + project);
 			JavaSourceWalker sourceWalker = new JavaSourceWalker();
 			List<File> sourceFiles = sourceWalker.getFiles("C:/Molay/ProjectWS/RSA/DEV_SIT3/" + project);
 			
-			ReturnExitLogCorrectionVisitor visitor = new ReturnExitLogCorrectionVisitor(true);
+			ReturnExitLogCorrectionVisitor visitor = new ReturnExitLogCorrectionVisitor(false);
 			SourceCodeProcessor processor = new SourceCodeProcessor(visitor);
 			for (File sourceFile : sourceFiles) {
 				String sourceCode = FileUtils.readFileToString(sourceFile, "cp1252");

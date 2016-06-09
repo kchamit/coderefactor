@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 
 public class RSAProjectHelper {
+	
+	private static boolean isSample = true;
 
 	private static final String[] RSA_BATCH_PROJECTS = new String[] {
 			"RsaAccountMerchandising", "RsaBatchCommon", "RsaBatchWeb", "RsaColorImportBatch", "RsaCommisionsBatch",
@@ -40,18 +42,30 @@ public class RSAProjectHelper {
 	private static final String[] CURRENT_RUN = new String[] {
 		"RsaCustomer", "RsaRentalContract"
 	};
+	
+	private static final String[] SAMPLE_PROJECTS = new String[] {
+		"SampleProject"
+	};
 
 	private static final String[] RSA_WAVE1_PROJECTS = new String[] {
 			"RsaCustomer", "RsaRentalContract"
 	};
 
 	public static Collection<String> getAllProjects() {
-		List<String> projects = new ArrayList<String>();
-		projects.addAll(Arrays.asList(RSA_BATCH_PROJECTS));
-		projects.addAll(Arrays.asList(RSA_BILLING_PROJECTS));
-		projects.addAll(Arrays.asList(RSA_COMMON_PROJECTS));
-		projects.addAll(Arrays.asList(RSA_CORE_PROJECTS));
-		return projects;
+		if(isSample){
+			return getSamplenProjects();
+		}else{
+			List<String> projects = new ArrayList<String>();
+			projects.addAll(Arrays.asList(RSA_BATCH_PROJECTS));
+			projects.addAll(Arrays.asList(RSA_BILLING_PROJECTS));
+			projects.addAll(Arrays.asList(RSA_COMMON_PROJECTS));
+			projects.addAll(Arrays.asList(RSA_CORE_PROJECTS));
+			return projects;
+		}
+	}
+	
+	public static Collection<String> getSamplenProjects() {
+		return Arrays.asList(SAMPLE_PROJECTS);
 	}
 
 	public static Collection<String> getBatchProjects() {
