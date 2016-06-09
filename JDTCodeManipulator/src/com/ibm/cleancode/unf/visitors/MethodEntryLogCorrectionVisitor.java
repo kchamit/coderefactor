@@ -29,6 +29,9 @@ public class MethodEntryLogCorrectionVisitor extends RewriteVisitor {
 	private int lowConfidenceMethodStartLog = 0;
 	private int highConfidenceMethodStartLog = 0;
 	private int compliantMethodStartLog = 0;
+	private int addedCount = 0;
+
+	private static final String LOG_STRING_SERVICE_TYPE = "if (getLoggingService().isInfoLevelEnable()) {\n\tgetLoggingService().info(this, \"#LOG_STR#\");\n}";
 
 	// do rewrite
 	boolean doRewrite = false;
@@ -40,7 +43,7 @@ public class MethodEntryLogCorrectionVisitor extends RewriteVisitor {
 
 	public boolean visit(MethodDeclaration methodDeclaration) {
 		// get first statement
-		if (methodDeclaration.getBody().statements().size() == 0) {
+		if (methodDeclaration.getBody() == null || methodDeclaration.getBody().statements().size() == 0) {
 			return false;
 		}
 		Object firstStatementInMethod = methodDeclaration.getBody().statements().get(0);
@@ -124,6 +127,7 @@ public class MethodEntryLogCorrectionVisitor extends RewriteVisitor {
 							+ getCompilationUnit().getLineNumber(_es.getStartPosition() - 1) + " in "
 							+ getSourceClassName() + ":" + methodDeclaration.getName().getFullyQualifiedName());
 					ENTRY_LOG_LOW_CONFIDENCE.info(logWrapperifStatament != null ? logWrapperifStatament : logStatement);
+					markForAddition(methodDeclaration, LogType.SERVICE);
 					return true;
 				}
 
@@ -156,7 +160,7 @@ public class MethodEntryLogCorrectionVisitor extends RewriteVisitor {
 					ENTRY_LOG_HIGH_CONFIDENCE
 							.info(logWrapperifStatament != null ? logWrapperifStatament : logStatement);
 					if (doRewrite) {
-						ListRewrite listRewrite = getAstRewrite().getListRewrite(_es,
+						ListRewrite listRewrite = getAstRewrite().getListRewrite(logStatement,
 								MethodInvocation.ARGUMENTS_PROPERTY);
 						StringLiteral logStaramentLiteral = (StringLiteral) getAstRewrite().createStringPlaceholder(
 								"\"" + expectedLogStatement + "\"", ASTNode.STRING_LITERAL);
@@ -179,21 +183,43 @@ public class MethodEntryLogCorrectionVisitor extends RewriteVisitor {
 							}
 							if (!logLevel.equals("INFO")) {
 								// change logger call
-								getAstRewrite().set(_es, MethodInvocation.NAME_PROPERTY,
+								getAstRewrite().set(logStatement, MethodInvocation.NAME_PROPERTY,
 										getAstRewrite().getAST().newSimpleName("info"), null);
 							}
 						}
 					}
 				}
 			} else {
-				if (CodeUtils.isEligibleForInsertion(methodDeclaration)) {
-					ENTRY_LOG_NOT_PRESETN.info("Entry log not found at "
-							+ getCompilationUnit().getLineNumber(_es.getStartPosition() - 1) + " in "
-							+ getSourceClassName() + ":" + methodDeclaration.getName().getFullyQualifiedName());
-				}
+				markForAddition(methodDeclaration, LogType.SERVICE);
 			}
 		}
 		return false;
+	}
+
+	private void markForAddition(MethodDeclaration methodDeclaration, LogType logType) {
+		if (CodeUtils.isEligibleForInsertion(methodDeclaration)) {
+			ENTRY_LOG_NOT_PRESETN.info("Entry log not found at "
+					+ getCompilationUnit().getLineNumber(methodDeclaration.getStartPosition() - 1) + " in "
+					+ getSourceClassName() + ":" + methodDeclaration.getName().getFullyQualifiedName());
+			if (doRewrite) {
+				String expectedLogStatement = getSourceClassName() + "#"
+						+ methodDeclaration.getName().getFullyQualifiedName() + ":start";
+				String finalLogStr = LOG_STRING_SERVICE_TYPE.replace("#LOG_STR#", expectedLogStatement);
+				if (logType == LogType.SERVICE) {
+					// add log statement to method
+					ListRewrite listRewrite = getAstRewrite().getListRewrite(methodDeclaration.getBody(),
+							Block.STATEMENTS_PROPERTY);
+					Statement placeHolder = (Statement) getAstRewrite().createStringPlaceholder(finalLogStr,
+							ASTNode.IF_STATEMENT);
+					listRewrite.insertFirst(placeHolder, null);
+				}
+			}
+			addedCount++;
+		} else {
+			ENTRY_LOG_NOT_PRESETN.info("Method ineligibe for Entry log at "
+					+ getCompilationUnit().getLineNumber(methodDeclaration.getStartPosition() - 1) + " in "
+					+ getSourceClassName() + ":" + methodDeclaration.getName().getFullyQualifiedName());
+		}
 	}
 
 	public List<MethodLogInspectionResult> getResults() {
@@ -214,6 +240,10 @@ public class MethodEntryLogCorrectionVisitor extends RewriteVisitor {
 
 	public int getCompliantMethodStartLog() {
 		return compliantMethodStartLog;
+	}
+
+	public int getAddedCount() {
+		return addedCount;
 	}
 
 	private boolean isPossibleMehtodStartLogLiteral(String s) {

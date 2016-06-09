@@ -37,6 +37,10 @@ public class RSAProjectHelper {
 			"RsaUc4Service"
 	};
 
+	private static final String[] RSA_WAVE1_PROJECTS = new String[] {
+			"RsaCustomer", "RsaRentalContract"
+	};
+
 	public static Collection<String> getAllProjects() {
 		List<String> projects = new ArrayList<String>();
 		projects.addAll(Arrays.asList(RSA_BATCH_PROJECTS));
@@ -68,5 +72,9 @@ public class RSAProjectHelper {
 		projects.addAll(Arrays.asList(RSA_COMMON_PROJECTS));
 		projects.addAll(Arrays.asList(RSA_CORE_PROJECTS));
 		return projects;
+	}
+
+	public static Collection<String> getWave1Projects() {
+		return Arrays.asList(RSA_WAVE1_PROJECTS);
 	}
 }
