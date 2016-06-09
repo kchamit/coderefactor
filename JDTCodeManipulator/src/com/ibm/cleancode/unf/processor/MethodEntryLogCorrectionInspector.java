@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 
 import com.ibm.cleancode.framework.processor.SourceCodeProcessor;
 import com.ibm.cleancode.framework.utility.InclusionJavaSourceWalker;
-import com.ibm.cleancode.framework.utility.JavaSourceWalker;
 import com.ibm.cleancode.unf.visitors.MethodEntryLogCorrectionVisitor;
 
 public class MethodEntryLogCorrectionInspector {
@@ -27,7 +26,6 @@ public class MethodEntryLogCorrectionInspector {
 				String modifiedSource = processor.start(sourceCode);
 				FileUtils.write(sourceFile, modifiedSource, "cp1252");
 			}
-			LOGGER.info("Finished processing: " + visitor.getIssueCount() + " issues in " + project);
 			LOGGER.info("Finished processing Low/High/Compliant/Added Confidece Method Start: "
 					+ visitor.getLowConfidenceMethodStartLog() + "/" + visitor.getHighConfidenceMethodStartLog() + "/"
 					+ visitor.getCompliantMethodStartLog() + "/" + visitor.getAddedCount() + " issues in " + project);
