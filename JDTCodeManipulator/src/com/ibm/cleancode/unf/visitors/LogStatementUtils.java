@@ -17,10 +17,10 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 
 import com.ibm.cleancode.unf.visitors.LogInspectionResult.LogType;
 
-
 public class LogStatementUtils {
-	private static final Set<String> logMethodNames = new HashSet<String>(Arrays.asList(new String[] { "trace",
-			"debug", "info", "warn", "error", "fatal" }));
+	private static final Set<String> logMethodNames = new HashSet<String>(Arrays.asList(new String[] {
+			"trace", "debug", "info", "warn", "error", "fatal"
+	}));
 
 	public static LogInspectionResult isLevelCheckedLogStatement(IfStatement statement, String expectedDebugStatement) {
 		LogInspectionResult inspectionResult = null;
@@ -98,13 +98,12 @@ public class LogStatementUtils {
 		return suspectedLogCheckCondition.getExpression().toString()
 				.matches(".*\\.is(Trace|Debug|Info|Warn|Error|Fatal)(Level)*Enable.*");
 	}
-	
-	
-	public static boolean isLoggerCall(MethodInvocation mie){
+
+	public static boolean isLoggerCall(MethodInvocation mie) {
 		String logMethodName = mie.getName().getFullyQualifiedName();
 		return logMethodNames.contains(logMethodName);
 	}
-	
+
 	public static LogType getLogType(MethodInvocation mie) {
 		// check if it is logging service log or a direct logger call
 		Expression loggerExpression = mie.getExpression();
@@ -115,7 +114,10 @@ public class LogStatementUtils {
 				return LogType.SERVICE_SUSPECT;
 			}
 		} else if (loggerExpression instanceof SimpleName) {
-			if (((SimpleName) loggerExpression).getFullyQualifiedName().matches(".*(l|L)(o|O)(g|G){2}(e|E)(r|R)")) {
+			if (((SimpleName) loggerExpression).getFullyQualifiedName().equals("loggingService")) {
+				return LogType.SERVICE;
+			} else if (((SimpleName) loggerExpression).getFullyQualifiedName()
+					.matches(".*(l|L)(o|O)(g|G){2}(e|E)(r|R)")) {
 				return LogType.DIRECT;
 			} else {
 				return LogType.DIRECT_SUSPECT;
@@ -139,5 +141,4 @@ public class LogStatementUtils {
 		}				
 		return eligible;
 	}
-
 }

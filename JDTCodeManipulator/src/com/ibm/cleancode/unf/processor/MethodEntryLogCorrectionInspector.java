@@ -15,16 +15,19 @@ public class MethodEntryLogCorrectionInspector {
 
 	public static void main(String[] args) throws Exception {
 		for (String project : RSAProjectHelper.getWave1Projects()) {
+			Boolean doRewrite = true;
 			LOGGER.info("Processing :" + project);
 			InclusionJavaSourceWalker sourceWalker = new InclusionJavaSourceWalker("*ManagedBean.java",
 					"*Mediator.java", "*Helper.java", "*FactoryImpl.java", "*Mapper.java");
 			List<File> sourceFiles = sourceWalker.getFiles("C:/Dev/UNF-Rsa-SIT3/" + project);
-			MethodEntryLogCorrectionVisitor visitor = new MethodEntryLogCorrectionVisitor(true);
+			MethodEntryLogCorrectionVisitor visitor = new MethodEntryLogCorrectionVisitor(doRewrite);
 			SourceCodeProcessor processor = new SourceCodeProcessor(visitor);
 			for (File sourceFile : sourceFiles) {
 				String sourceCode = FileUtils.readFileToString(sourceFile, "cp1252");
 				String modifiedSource = processor.start(sourceCode);
-				FileUtils.write(sourceFile, modifiedSource, "cp1252");
+				if (doRewrite) {
+					FileUtils.write(sourceFile, modifiedSource, "cp1252");
+				}
 			}
 			LOGGER.info("Finished processing Low/High/Compliant/Added Confidece Method Start: "
 					+ visitor.getLowConfidenceMethodStartLog() + "/" + visitor.getHighConfidenceMethodStartLog() + "/"
